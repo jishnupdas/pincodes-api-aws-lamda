@@ -15,33 +15,6 @@ def parse_csv(file="data.csv"):
     return df
 
 
-def get_pincode(df, pincode):
-    """
-    :param pincode: The pincode to search for.
-    :return: The result of the search.
-    """
-    # convert pincode to integer
-    try:
-        pincode = int(pincode)
-        logger.info(f"Converted pincode to integer: {pincode}")
-        return df[df["pincode"] == pincode].to_dict(orient="records")
-    except ValueError:
-        logger.error(f"Invalid pincode: {pincode}")
-        return "Invalid pincode"
-
-
-def get_city(df, city):
-    """
-    :param city: The city to search for.
-    :return: The result of the search.
-    """
-    try:
-        return df[df["city"] == city].to_dict(orient="records")
-    except ValueError:
-        logger.error(f"Invalid city: {city}")
-        return "Invalid city"
-
-
 def filter_df(df, column, value):
     """
     :param df: The dataframe to filter.
@@ -50,7 +23,7 @@ def filter_df(df, column, value):
     :return: The filtered dataframe.
     """
     logger.info(f"Filtering dataframe on column: {column} and value: {value}")
-    return df.query(f'{column} == "{value}"').to_dict(orient="records")
+    return df.query(f"{column} == {value}").to_dict(orient="records")
 
 
 def get_results(event):
@@ -63,10 +36,11 @@ def get_results(event):
     for key, value in event.items():
         if key in df.columns:
             response[key] = filter_df(df, key, value)
-        else:
-            response[key] = "Invalid key"
 
-    return response
+    if response.keys():
+        return response
+    else:
+        return {"message": "No results found"}
 
 
 def lambda_handler(event, context):
