@@ -49,7 +49,8 @@ def filter_df(df, column, value):
     :param value: The value to filter on.
     :return: The filtered dataframe.
     """
-    return df[df[column] == value].to_dict(orient="records")
+    logger.info(f"Filtering dataframe on column: {column} and value: {value}")
+    return df.query(f'{column} == "{value}"').to_dict(orient="records")
 
 
 def get_results(event):
@@ -64,7 +65,7 @@ def get_results(event):
             response[key] = filter_df(df, key, value)
         else:
             response[key] = "Invalid key"
-    
+
     return response
 
 
